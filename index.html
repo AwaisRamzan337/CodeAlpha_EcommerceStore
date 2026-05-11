@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyStore 👑</title>
+    <link rel="stylesheet" href="public/style.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <h2>👑 MyStore</h2>
+        <div class="navbar-links" id="navLinks">
+            <span id="userInfo"></span>
+            <a href="#products">Shop</a>
+            <a href="/wishlist">❤️ Wishlist</a>
+            <a href="/orders">📦 Orders</a>
+            <a href="/profile" id="profileBtn" style="display:none">👤 Profile</a>
+            <a href="/login" id="loginBtn">Login</a>
+            <a href="/logout" id="logoutBtn" style="display:none">Logout</a>
+        </div>
+        <button class="hamburger" onclick="toggleMenu()" id="hamburger">☰</button>
+    </nav>
+
+    <!-- HERO -->
+    <div class="hero">
+        <h1>Elevate Your<br><span>Shopping Experience</span></h1>
+        <p>Discover premium products curated just for you — luxury at every price point.</p>
+        <div class="hero-btns">
+            <button class="btn-hero btn-hero-primary"
+                onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">
+                🛍️ Shop Now
+            </button>
+            <button class="btn-hero btn-hero-secondary"
+                onclick="window.location.href='/login'">
+                👤 Sign In
+            </button>
+        </div>
+    </div>
+
+    <!-- FLASH SALE -->
+    <div class="flash-sale">
+        <h3>⚡ Flash Sale</h3>
+        <span>Limited time offer — ends in:</span>
+        <span id="countdown">00:00:00</span>
+    </div>
+
+    <!-- SEARCH & FILTER -->
+    <div class="search-section">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search products..." oninput="filterProducts()">
+            <button onclick="filterProducts()">🔍 Search</button>
+        </div>
+        <div class="filter-box">
+            <select id="categoryFilter" onchange="filterProducts()">
+                <option value="all">All Categories</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Accessories">Accessories</option>
+                <option value="Wearables">Wearables</option>
+            </select>
+            <select id="priceFilter" onchange="filterProducts()">
+                <option value="all">All Prices</option>
+                <option value="low">Under $200</option>
+                <option value="mid">$200 - $500</option>
+                <option value="high">Above $500</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- CATEGORIES -->
+    <div class="categories">
+        <h2>Browse <span>Categories</span></h2>
+        <div class="cat-grid">
+            <div class="cat-card active" onclick="setCat('all', this)">
+                <div class="cat-emoji">🛍️</div>
+                <p>All</p>
+            </div>
+            <div class="cat-card" onclick="setCat('Electronics', this)">
+                <div class="cat-emoji">💻</div>
+                <p>Electronics</p>
+            </div>
+            <div class="cat-card" onclick="setCat('Accessories', this)">
+                <div class="cat-emoji">🎧</div>
+                <p>Accessories</p>
+            </div>
+            <div class="cat-card" onclick="setCat('Wearables', this)">
+                <div class="cat-emoji">⌚</div>
+                <p>Wearables</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="container" id="products">
+        <h2 style="font-family:'Poppins',sans-serif; font-size:24px; margin-bottom:5px">
+            Featured <span style="color:var(--gold)">Products</span>
+        </h2>
+        <p style="color:var(--muted); font-size:14px; margin-bottom:20px">
+            Premium quality, handpicked for you
+        </p>
+
+        <!-- SKELETON LOADER -->
+        <div class="products-grid" id="skeletonGrid">
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-img"></div>
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-btn"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-img"></div>
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-btn"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-img"></div>
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-btn"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-img"></div>
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-btn"></div>
+            </div>
+        </div>
+
+        <div class="products-grid" id="productsGrid" style="display:none"></div>
+    </div>
+
+    <!-- CART -->
+    <div class="container">
+        <div class="cart-section">
+            <h2>🛒 My Cart <span class="cart-count" id="cartCount">0</span></h2>
+            <div id="cartItems"><p style="color:var(--muted)">Your cart is empty.</p></div>
+            <div class="cart-total" id="cartTotal"></div>
+            <button class="btn-order" onclick="goCheckout()">Proceed to Checkout →</button>
+        </div>
+    </div>
+
+    <!-- TESTIMONIALS -->
+    <div class="testimonials">
+        <div class="container">
+            <h2 style="font-family:'Poppins',sans-serif; font-size:24px; text-align:center; margin-bottom:8px">
+                What Our <span style="color:var(--gold)">Customers Say</span>
+            </h2>
+            <p style="text-align:center; color:var(--muted); font-size:14px; margin-bottom:35px">
+                Trusted by thousands of happy shoppers
+            </p>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"Absolutely love the quality! Fast delivery and premium packaging. Will definitely shop again."</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">AK</div>
+                        <div>
+                            <strong>Ahmed Khan</strong>
+                            <span>Verified Buyer</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"Best online store I've used. The products are exactly as described and the UI is so smooth!"</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">SR</div>
+                        <div>
+                            <strong>Sara Raza</strong>
+                            <span>Verified Buyer</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"Premium feel, great prices. The checkout process was seamless. Highly recommended!"</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar">MJ</div>
+                        <div>
+                            <strong>Muneeb Javed</strong>
+                            <span>Verified Buyer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div>
+                <h3>👑 MyStore</h3>
+                <p>Premium shopping experience with luxury products at every price point. Quality guaranteed.</p>
+                <div style="margin-top:15px; display:flex; gap:12px">
+                    <a href="mailto:awaisramzanfts@gmail.com" style="color:var(--gold); font-size:20px" title="Email">📧</a>
+                    <a href="tel:03260668582" style="color:var(--gold); font-size:20px" title="Phone">📞</a>
+                    <a href="#" style="color:var(--gold); font-size:20px" title="Facebook">📘</a>
+                    <a href="#" style="color:var(--gold); font-size:20px" title="LinkedIn">💼</a>
+                </div>
+            </div>
+            <div>
+                <h4>Quick Links</h4>
+                <a href="/">Home</a>
+                <a href="#products">Shop</a>
+                <a href="/wishlist">Wishlist</a>
+                <a href="/orders">My Orders</a>
+                <a href="/profile">Profile</a>
+            </div>
+            <div>
+                <h4>Categories</h4>
+                <a href="#">Electronics</a>
+                <a href="#">Accessories</a>
+                <a href="#">Wearables</a>
+                <a href="#">New Arrivals</a>
+            </div>
+            <div>
+                <h4>Contact Us</h4>
+                <a href="mailto:awaisramzanfts@gmail.com">📧 awaisramzanfts@gmail.com</a>
+                <a href="tel:03260668582">📞 03260668582</a>
+                <a href="#">📍 Faisalabad, Pakistan</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 <strong style="color:var(--gold)">MyStore</strong> — Developed by <strong style="color:var(--gold)">Muhammad Awais Ramzan</strong> | <strong style="color:var(--gold)">CodeAlpha</strong> Internship Project. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

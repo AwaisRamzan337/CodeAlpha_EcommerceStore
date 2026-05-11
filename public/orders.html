@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Orders — MyStore</title>
+    <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <h2>👑 MyStore</h2>
+        <div class="navbar-links">
+            <a href="/">Home</a>
+            <a href="/wishlist">❤️ Wishlist</a>
+            <a href="/profile">👤 Profile</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 style="font-family:'Poppins',sans-serif; margin-bottom:25px">
+            📦 My <span style="color:var(--gold)">Orders</span>
+        </h2>
+        <div id="ordersList"></div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-bottom" style="border-top:none; padding-top:0">
+            <p>© 2026 MyStore. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        async function loadOrders() {
+            const res = await fetch('/api/orders');
+            const orders = await res.json();
+            const div = document.getElementById('ordersList');
+
+            if (orders.success === false) {
+                window.location.href = '/login';
+                return;
+            }
+
+            if (orders.length === 0) {
+                div.innerHTML = `
+                    <div style="text-align:center; padding:80px; color:var(--muted)">
+                        <div style="font-size:60px">📦</div>
+                        <h3 style="margin-top:20px; font-family:'Poppins',sans-serif">
+                            No orders yet!
+                        </h3>
+                        <a href="/" style="color:var(--gold)">Start Shopping →</a>
+                    </div>`;
+                return;
+            }
+
+            div.innerHTML = orders.map(order => `
+                <div class="order-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center">
+                        <h3>${order.product_name}</h3>
+                        <span style="background:rgba(34,197,94,0.1);
+                        border:1px solid rgba(34,197,94,0.3);
+                        color:#22C55E; padding:4px 12px;
+                        border-radius:20px; font-size:12px">
+                            ${order.status || 'Processing'}
+                        </span>
+                    </div>
+                    <p style="margin-top:8px">💰 Amount: <strong style="color:var(--gold)">$${order.total}</strong></p>
+                    <p>📅 Date: ${order.date}</p>
+                </div>
+            `).join('');
+        }
+
+        loadOrders();
+    </script>
+</body>
+</html>

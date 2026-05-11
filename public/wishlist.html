@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wishlist — MyStore</title>
+    <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <h2>👑 MyStore</h2>
+        <div class="navbar-links">
+            <a href="/">Home</a>
+            <a href="/orders">📦 Orders</a>
+            <a href="/profile">👤 Profile</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2 style="font-family:'Poppins',sans-serif; margin-bottom:25px">
+            ❤️ My <span style="color:var(--gold)">Wishlist</span>
+        </h2>
+        <div class="wishlist-grid" id="wishlistGrid"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <footer class="footer">
+        <div class="footer-bottom" style="border-top:none; padding-top:0">
+            <p>© 2026 MyStore. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        let wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
+
+        function renderWishlist() {
+            const grid = document.getElementById('wishlistGrid');
+
+            if (wishlist.length === 0) {
+                grid.innerHTML = `
+                    <div style="text-align:center; padding:80px; color:var(--muted); grid-column:1/-1">
+                        <div style="font-size:60px">💔</div>
+                        <h3 style="margin-top:20px; font-family:'Poppins',sans-serif">
+                            Wishlist is empty!
+                        </h3>
+                        <a href="/" style="color:var(--gold)">Go Shopping →</a>
+                    </div>`;
+                return;
+            }
+
+            grid.innerHTML = wishlist.map((p, i) => `
+                <div class="product-card">
+                    <span class="emoji">${p.image}</span>
+                    <h3>${p.name}</h3>
+                    <p class="desc">${p.description}</p>
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <div class="price">$${p.price}</div>
+                    <button class="btn-cart" onclick="moveToCart(${i})"
+                        style="margin-bottom:8px">
+                        🛒 Add to Cart
+                    </button>
+                    <button onclick="removeFromWishlist(${i})"
+                        style="width:100%; padding:10px;
+                        background:rgba(239,68,68,0.1);
+                        color:#EF4444; border:1px solid rgba(239,68,68,0.3);
+                        border-radius:4px; cursor:pointer; font-size:13px;
+                        font-weight:600; transition:all 0.3s"
+                        onmouseover="this.style.background='#EF4444';this.style.color='white'"
+                        onmouseout="this.style.background='rgba(239,68,68,0.1)';this.style.color='#EF4444'">
+                        ❌ Remove
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function removeFromWishlist(index) {
+            const name = wishlist[index].name;
+            wishlist.splice(index, 1);
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            renderWishlist();
+            showToast(`💔 ${name} removed!`, 'error');
+        }
+
+        function moveToCart(index) {
+            const item = wishlist[index];
+            const cart = JSON.parse(localStorage.getItem('checkoutCart') || '[]');
+            cart.push({ name: item.name, price: item.price });
+            localStorage.setItem('checkoutCart', JSON.stringify(cart));
+            showToast(`✅ ${item.name} added to cart!`, 'success');
+            setTimeout(() => window.location.href = '/checkout', 1500);
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        renderWishlist();
+    </script>
+</body>
+</html>

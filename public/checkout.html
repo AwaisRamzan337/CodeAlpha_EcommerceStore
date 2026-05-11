@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout — MyStore</title>
+    <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <h2>👑 MyStore</h2>
+        <div class="navbar-links">
+            <a href="/">Home</a>
+            <a href="/orders">My Orders</a>
+        </div>
+    </nav>
+
+    <div class="checkout-box">
+        <h2>💳 Checkout</h2>
+
+        <div class="order-summary">
+            <h3 style="margin-bottom:15px; font-family:'Poppins',sans-serif">
+                🛍️ Order Summary
+            </h3>
+            <div id="summaryItems"></div>
+            <div style="font-size:20px; font-weight:bold;
+            margin-top:15px; color:var(--gold);
+            font-family:'Poppins',sans-serif" id="summaryTotal"></div>
+        </div>
+
+        <h3 style="margin-bottom:15px; font-family:'Poppins',sans-serif">
+            📦 Delivery Information
+        </h3>
+        <input type="text" id="fullName" placeholder="Full Name" />
+        <input type="text" id="address" placeholder="Delivery Address" />
+        <input type="text" id="city" placeholder="City" />
+        <input type="text" id="phone" placeholder="Phone Number" />
+
+        <h3 style="margin:15px 0; font-family:'Poppins',sans-serif">
+            💳 Payment Method
+        </h3>
+        <select id="paymentMethod">
+            <option value="card">Credit / Debit Card</option>
+            <option value="cod">Cash on Delivery</option>
+            <option value="easypaisa">Easypaisa</option>
+            <option value="jazzcash">JazzCash</option>
+        </select>
+
+        <div id="cardDetails" style="margin-top:15px">
+            <input type="text" id="cardNum" placeholder="Card Number (fake ok!)" maxlength="16"/>
+            <input type="text" id="cardExpiry" placeholder="Expiry (MM/YY)" maxlength="5"/>
+            <input type="text" id="cardCvv" placeholder="CVV" maxlength="3"/>
+        </div>
+
+        <button class="btn-order" style="margin-top:20px" onclick="placeOrder()">
+            ✅ Place Order
+        </button>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const cart = JSON.parse(localStorage.getItem('checkoutCart') || '[]');
+
+        document.getElementById('paymentMethod').addEventListener('change', function() {
+            document.getElementById('cardDetails').style.display =
+                this.value === 'card' ? 'block' : 'none';
+        });
+
+        function showSummary() {
+            const div = document.getElementById('summaryItems');
+            if (cart.length === 0) {
+                div.innerHTML = '<p style="color:var(--muted)">No items!</p>';
+                return;
+            }
+            div.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <span>🛍️ ${item.name}</span>
+                    <span style="color:var(--gold); font-weight:bold">$${item.price}</span>
+                </div>
+            `).join('');
+            const total = cart.reduce((s, i) => s + i.price, 0);
+            document.getElementById('summaryTotal').textContent = `Total: $${total}`;
+        }
+
+        async function placeOrder() {
+            const name = document.getElementById('fullName').value;
+            const address = document.getElementById('address').value;
+            const city = document.getElementById('city').value;
+            const phone = document.getElementById('phone').value;
+
+            if (!name || !address || !city || !phone) {
+                showToast('Please fill all delivery details!', 'error');
+                return;
+            }
+
+            if (cart.length === 0) {
+                showToast('Cart is empty!', 'error');
+                return;
+            }
+
+            const res = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ items: cart })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                localStorage.removeItem('checkoutCart');
+                showToast('🎉 Order placed successfully!', 'success');
+                setTimeout(() => window.location.href = '/orders', 2000);
+            } else {
+                showToast(data.message || 'Please login first!', 'error');
+                setTimeout(() => window.location.href = '/login', 2000);
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        showSummary();
+    </script>
+</body>
+</html>

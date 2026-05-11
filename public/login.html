@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login — MyStore</title>
+    <link rel="stylesheet" href="/public/style.css">
+</head>
+<body>
+
+    <div class="auth-container">
+        <h1>👑 <span>MyStore</span></h1>
+
+        <div class="auth-box">
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('login')">Login</button>
+                <button class="tab" onclick="showTab('register')">Register</button>
+            </div>
+
+            <div id="loginForm">
+                <input type="text" id="loginUsername" placeholder="Username" />
+                <input type="password" id="loginPassword" placeholder="Password" />
+                <button class="btn-main" onclick="login()">Login</button>
+                <p id="loginMsg" class="msg"></p>
+            </div>
+
+            <div id="registerForm" style="display:none">
+                <input type="text" id="regUsername" placeholder="Choose Username" />
+                <input type="password" id="regPassword" placeholder="Choose Password" />
+                <button class="btn-main" onclick="register()">Register</button>
+                <p id="registerMsg" class="msg"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tab) {
+            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        async function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const res = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            if (data.success) {
+                window.location.href = '/';
+            } else {
+                document.getElementById('loginMsg').textContent = data.message;
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            const res = await fetch('/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            document.getElementById('registerMsg').textContent = data.message;
+            if (data.success) {
+                setTimeout(() => showTab('login'), 1000);
+            }
+        }
+    </script>
+</body>
+</html>
